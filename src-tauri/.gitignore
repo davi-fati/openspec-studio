@@ -1,0 +1,4 @@
+/target/
+/gen/schemas
+# Sidecar binaries are build outputs (make sidecar).
+/binaries/

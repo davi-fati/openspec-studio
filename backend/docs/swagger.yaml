@@ -1,0 +1,1315 @@
+basePath: /api
+definitions:
+  domain.HealthResult:
+    properties:
+      message:
+        type: string
+      ok:
+        type: boolean
+    type: object
+  domain.Overview:
+    properties:
+      projects:
+        items:
+          $ref: '#/definitions/domain.ProjectOverview'
+        type: array
+      recentlyUpdated:
+        description: most recently opened first
+        items:
+          $ref: '#/definitions/domain.RecentProject'
+        type: array
+      totalInProgress:
+        type: integer
+      totalOpenChanges:
+        description: draft+todo+in_progress across all projects
+        type: integer
+    type: object
+  domain.ProjectOverview:
+    properties:
+      available:
+        type: boolean
+      brokenSpecCount:
+        description: specs with an unavailable cross-project dependency
+        type: integer
+      changeCounts:
+        additionalProperties:
+          type: integer
+        description: status -> count, over draft/todo/in_progress/done/archived
+        type: object
+      progressRatio:
+        description: (done+archived) / (todo+in_progress+done+archived), 0 when no
+          non-draft changes exist
+        type: number
+      projectId:
+        type: integer
+      projectName:
+        type: string
+      specCount:
+        type: integer
+    type: object
+  domain.RecentProject:
+    properties:
+      lastOpenedAt:
+        type: string
+      projectId:
+        type: integer
+      projectName:
+        type: string
+    type: object
+  domain.SpecProvenance:
+    properties:
+      author:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      project:
+        type: string
+    type: object
+  handler.artifactRefDTO:
+    properties:
+      capability:
+        type: string
+      changeName:
+        type: string
+      kind:
+        type: string
+    type: object
+  handler.browseEntryDTO:
+    properties:
+      hasOpenspec:
+        type: boolean
+      isEmpty:
+        type: boolean
+      name:
+        type: string
+      path:
+        type: string
+    type: object
+  handler.browseResponse:
+    properties:
+      entries:
+        items:
+          $ref: '#/definitions/handler.browseEntryDTO'
+        type: array
+      hasOpenspec:
+        type: boolean
+      isEmpty:
+        type: boolean
+      parent:
+        type: string
+      path:
+        type: string
+    type: object
+  handler.changeDetailResponse:
+    properties:
+      designMarkdown:
+        type: string
+      hasDesign:
+        type: boolean
+      hasProposal:
+        type: boolean
+      hasSpecs:
+        type: boolean
+      hasTasks:
+        type: boolean
+      id:
+        type: string
+      name:
+        type: string
+      projectId:
+        type: integer
+      projectName:
+        type: string
+      proposalMarkdown:
+        type: string
+      specs:
+        additionalProperties:
+          type: string
+        type: object
+      status:
+        type: string
+      tasksDone:
+        type: integer
+      tasksMarkdown:
+        type: string
+      tasksTotal:
+        type: integer
+    type: object
+  handler.changeResponse:
+    properties:
+      hasDesign:
+        type: boolean
+      hasProposal:
+        type: boolean
+      hasSpecs:
+        type: boolean
+      hasTasks:
+        type: boolean
+      id:
+        type: string
+      name:
+        type: string
+      projectId:
+        type: integer
+      projectName:
+        type: string
+      status:
+        type: string
+      tasksDone:
+        type: integer
+      tasksTotal:
+        type: integer
+    type: object
+  handler.createDebtRequest:
+    properties:
+      body:
+        type: string
+      link:
+        $ref: '#/definitions/handler.artifactRefDTO'
+      title:
+        type: string
+    required:
+    - title
+    type: object
+  handler.createFlowRequest:
+    properties:
+      changeNames:
+        items:
+          type: string
+        type: array
+      projectId:
+        type: integer
+      providerId:
+        type: integer
+      scheduledAt:
+        description: RFC3339
+        type: string
+    required:
+    - changeNames
+    - projectId
+    - providerId
+    - scheduledAt
+    type: object
+  handler.createProviderRequest:
+    properties:
+      apiKey:
+        type: string
+      cliArgs:
+        items:
+          type: string
+        type: array
+      cliPath:
+        type: string
+      endpoint:
+        type: string
+      isDefault:
+        type: boolean
+      kind:
+        description: '"hosted" or "cli"'
+        type: string
+      model:
+        type: string
+      name:
+        type: string
+    required:
+    - kind
+    - name
+    type: object
+  handler.createReviewRequest:
+    properties:
+      body:
+        type: string
+      link:
+        $ref: '#/definitions/handler.artifactRefDTO'
+      title:
+        type: string
+    required:
+    - title
+    type: object
+  handler.createSpecRequest:
+    properties:
+      capability:
+        type: string
+      projectId:
+        type: integer
+      purpose:
+        type: string
+      requirements:
+        items:
+          $ref: '#/definitions/handler.specRequirementDTO'
+        type: array
+    required:
+    - capability
+    - projectId
+    type: object
+  handler.debtResponse:
+    properties:
+      body:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      link:
+        $ref: '#/definitions/handler.artifactRefDTO'
+      projectId:
+        type: integer
+      status:
+        type: string
+      title:
+        type: string
+    type: object
+  handler.dependencyRequest:
+    properties:
+      targetCapability:
+        type: string
+      targetProjectId:
+        type: integer
+    required:
+    - targetCapability
+    - targetProjectId
+    type: object
+  handler.errorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  handler.flowItemResponse:
+    properties:
+      changeName:
+        type: string
+      finishedAt:
+        type: string
+      id:
+        type: integer
+      log:
+        type: string
+      position:
+        type: integer
+      startedAt:
+        type: string
+      status:
+        type: string
+    type: object
+  handler.flowResponse:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/handler.flowItemResponse'
+        type: array
+      missed:
+        type: boolean
+      projectId:
+        type: integer
+      projectName:
+        type: string
+      providerId:
+        type: integer
+      scheduledAt:
+        type: string
+      status:
+        type: string
+    type: object
+  handler.generateSpecRequest:
+    properties:
+      description:
+        type: string
+      providerId:
+        description: 0 = use the configured default provider
+        type: integer
+    required:
+    - description
+    type: object
+  handler.healthzResponse:
+    properties:
+      status:
+        type: string
+      version:
+        type: string
+    type: object
+  handler.openProjectRequest:
+    properties:
+      path:
+        type: string
+    required:
+    - path
+    type: object
+  handler.projectResponse:
+    properties:
+      available:
+        type: boolean
+      id:
+        type: integer
+      lastOpenedAt:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+    type: object
+  handler.providerResponse:
+    properties:
+      cliArgs:
+        items:
+          type: string
+        type: array
+      cliPath:
+        type: string
+      createdAt:
+        type: string
+      endpoint:
+        type: string
+      hasApiKey:
+        type: boolean
+      id:
+        type: integer
+      isDefault:
+        type: boolean
+      kind:
+        type: string
+      model:
+        type: string
+      name:
+        type: string
+    type: object
+  handler.reorderFlowRequest:
+    properties:
+      itemIds:
+        items:
+          type: integer
+        type: array
+    required:
+    - itemIds
+    type: object
+  handler.reviewResponse:
+    properties:
+      body:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: string
+      link:
+        $ref: '#/definitions/handler.artifactRefDTO'
+      projectId:
+        type: integer
+      title:
+        type: string
+    type: object
+  handler.specDependencyDTO:
+    properties:
+      available:
+        type: boolean
+      capability:
+        type: string
+      projectName:
+        type: string
+      projectPath:
+        type: string
+    type: object
+  handler.specRequirementDTO:
+    properties:
+      body:
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  handler.specResponse:
+    properties:
+      capability:
+        type: string
+      dependedBy:
+        items:
+          $ref: '#/definitions/handler.specDependencyDTO'
+        type: array
+      dependsOn:
+        items:
+          $ref: '#/definitions/handler.specDependencyDTO'
+        type: array
+      id:
+        type: string
+      linkedDebts:
+        items:
+          $ref: '#/definitions/handler.debtResponse'
+        type: array
+      linkedReviews:
+        items:
+          $ref: '#/definitions/handler.reviewResponse'
+        type: array
+      projectId:
+        type: integer
+      projectName:
+        type: string
+      provenance:
+        $ref: '#/definitions/domain.SpecProvenance'
+      purpose:
+        type: string
+      requirements:
+        items:
+          $ref: '#/definitions/handler.specRequirementDTO'
+        type: array
+    type: object
+  handler.updateDebtRequest:
+    properties:
+      status:
+        type: string
+    required:
+    - status
+    type: object
+  handler.updateProviderRequest:
+    properties:
+      apiKey:
+        type: string
+      cliArgs:
+        items:
+          type: string
+        type: array
+      cliPath:
+        type: string
+      endpoint:
+        type: string
+      model:
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  handler.updateSpecRequest:
+    properties:
+      purpose:
+        type: string
+      requirements:
+        items:
+          $ref: '#/definitions/handler.specRequirementDTO'
+        type: array
+    type: object
+info:
+  contact: {}
+  description: REST + SSE API for the OpenSpec Studio backend.
+  title: OpenSpec Studio API
+  version: "1.0"
+paths:
+  /ai-providers:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.providerResponse'
+            type: array
+      summary: List configured AI providers
+      tags:
+      - ai-providers
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Provider config
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createProviderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handler.providerResponse'
+        "400":
+          description: invalid kind, or CLI executable not found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Configure a new AI provider
+      tags:
+      - ai-providers
+  /ai-providers/{id}:
+    delete:
+      parameters:
+      - description: Provider id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+      summary: Delete an AI provider
+      tags:
+      - ai-providers
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Provider id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated config
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.updateProviderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.providerResponse'
+      summary: Update an AI provider
+      tags:
+      - ai-providers
+  /ai-providers/{id}/default:
+    post:
+      parameters:
+      - description: Provider id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+      summary: Set the default AI provider
+      tags:
+      - ai-providers
+  /ai-providers/{id}/health:
+    post:
+      parameters:
+      - description: Provider id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.HealthResult'
+      summary: Run a connectivity health check against a provider
+      tags:
+      - ai-providers
+  /changes:
+    get:
+      description: Lists every change across every registered, available project (or
+        a single project via ?projectId=), including archived changes, with Kanban
+        lifecycle status computed.
+      parameters:
+      - description: Filter to a single registered project
+        in: query
+        name: projectId
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.changeResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: List changes
+      tags:
+      - changes
+  /changes/{id}:
+    get:
+      description: Returns a change's full artifact content (proposal/design/tasks/specs)
+        for the Kanban card detail view.
+      parameters:
+      - description: Change id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.changeDetailResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get change detail
+      tags:
+      - changes
+  /events:
+    get:
+      description: Server-Sent Events stream. Emits an "update" event (with the changed
+        file path as data) whenever a watched project's openspec/ directory changes
+        on disk, plus a periodic heartbeat comment. Not a JSON request/response endpoint
+        - no response schema applies.
+      produces:
+      - text/event-stream
+      responses: {}
+      summary: Real-time update stream (SSE)
+      tags:
+      - events
+  /fs/browse:
+    get:
+      description: 'Lists a directory''s real subdirectories on the machine the backend
+        runs on, flagging each as an existing OpenSpec project and/or empty - powers
+        the in-app Open/New directory picker. Read-only: never creates, modifies,
+        or deletes anything. Defaults to the user''s home directory when path is omitted.'
+      parameters:
+      - description: Absolute directory path to list (defaults to home directory)
+        in: query
+        name: path
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.browseResponse'
+        "400":
+          description: path does not exist or is not a directory
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Browse local directories
+      tags:
+      - filesystem
+  /healthz:
+    get:
+      description: Reports that the backend process is up, and its version.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.healthzResponse'
+      summary: Health check
+      tags:
+      - healthz
+  /overview:
+    get:
+      description: 'Aggregates spec/change progress across every registered project
+        (or a single project via ?projectId=): per-project spec/change-stage counts,
+        a progress ratio, and a broken-cross-project-dependency count, plus aggregate
+        totals and a most-recently-updated list of {projectId, projectName, lastOpenedAt}
+        entries.'
+      parameters:
+      - description: Scope the overview to a single registered project
+        in: query
+        name: projectId
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Overview'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get cross-project overview
+      tags:
+      - overview
+  /projects:
+    get:
+      description: Lists every registered project, most recently opened first. A project
+        whose path no longer exists on disk is included with available=false rather
+        than omitted.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.projectResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: List registered projects
+      tags:
+      - projects
+    post:
+      consumes:
+      - application/json
+      description: 'Registers a directory as an active project. Read-only discovery:
+        the directory must already contain a valid openspec/ structure - Open never
+        scaffolds one. Use POST /projects/new for that.'
+      parameters:
+      - description: Directory to open
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.openProjectRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.projectResponse'
+        "400":
+          description: path missing, does not exist, or has no valid openspec/ structure
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Open (register) an existing project
+      tags:
+      - projects
+  /projects/{id}/debts:
+    get:
+      parameters:
+      - description: Project id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.debtResponse'
+            type: array
+      summary: List a project's tech-debt items
+      tags:
+      - context
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Debt item
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createDebtRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handler.debtResponse'
+      summary: Create a tech-debt item
+      tags:
+      - context
+  /projects/{id}/debts/{debtId}:
+    delete:
+      parameters:
+      - description: Project id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Debt id
+        in: path
+        name: debtId
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+      summary: Delete a tech-debt item
+      tags:
+      - context
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Debt id
+        in: path
+        name: debtId
+        required: true
+        type: string
+      - description: New status
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.updateDebtRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.debtResponse'
+      summary: Update a tech-debt item's status
+      tags:
+      - context
+  /projects/{id}/reviews:
+    get:
+      parameters:
+      - description: Project id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.reviewResponse'
+            type: array
+      summary: List a project's reviews
+      tags:
+      - context
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Project id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Review
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createReviewRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handler.reviewResponse'
+      summary: Create a review note
+      tags:
+      - context
+  /projects/{id}/reviews/{reviewId}:
+    delete:
+      parameters:
+      - description: Project id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Review id
+        in: path
+        name: reviewId
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+      summary: Delete a review note
+      tags:
+      - context
+  /projects/new:
+    post:
+      consumes:
+      - application/json
+      description: Scaffolds a fresh OpenSpec structure in an empty (or nonexistent-content)
+        directory and registers it, distinct from opening an existing project.
+      parameters:
+      - description: Directory to create the project in
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.openProjectRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handler.projectResponse'
+        "400":
+          description: path missing, does not exist, or is not empty
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Create a new project
+      tags:
+      - projects
+  /specflow/flows:
+    get:
+      description: Lists scheduled flows, optionally filtered to one project.
+      parameters:
+      - description: Filter to a single registered project
+        in: query
+        name: projectId
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.flowResponse'
+            type: array
+      summary: List Specflow flows
+      tags:
+      - specflow
+    post:
+      consumes:
+      - application/json
+      description: Only fully-planned changes can be scheduled, and dependency order
+        is validated before the flow is saved.
+      parameters:
+      - description: Flow
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createFlowRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handler.flowResponse'
+        "400":
+          description: incomplete change or unmet dependency
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Schedule a new Specflow flow
+      tags:
+      - specflow
+  /specflow/flows/{id}:
+    delete:
+      parameters:
+      - description: Flow id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+      summary: Delete a Specflow flow
+      tags:
+      - specflow
+    get:
+      parameters:
+      - description: Flow id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.flowResponse'
+      summary: Get a Specflow flow
+      tags:
+      - specflow
+  /specflow/flows/{id}/cancel:
+    post:
+      description: Terminates the in-progress provider process and marks the flow
+        cancelled; already-succeeded items are left intact.
+      parameters:
+      - description: Flow id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "409":
+          description: flow is not running
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Cancel a running Specflow flow
+      tags:
+      - specflow
+  /specflow/flows/{id}/reorder:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Flow id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: New item order
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.reorderFlowRequest'
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: flow already started
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Reorder a pending flow's items
+      tags:
+      - specflow
+  /specs:
+    get:
+      description: Lists every spec across every registered, available project (or
+        a single project via ?projectId=), with resolved dependency links.
+      parameters:
+      - description: Filter to a single registered project
+        in: query
+        name: projectId
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.specResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: List specs
+      tags:
+      - specs
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: New spec
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createSpecRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handler.specResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "409":
+          description: spec already exists
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Create a spec
+      tags:
+      - specs
+  /specs/{id}:
+    delete:
+      description: Deletes a spec. If other specs depend on it and force=true is not
+        set, returns 409 with the list of dependent specs instead of deleting.
+      parameters:
+      - description: Spec id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Delete despite dependents
+        in: query
+        name: force
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "409":
+          description: dependent specs
+          schema:
+            items:
+              $ref: '#/definitions/handler.specResponse'
+            type: array
+      summary: Delete a spec
+      tags:
+      - specs
+    get:
+      parameters:
+      - description: Spec id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.specResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get a spec
+      tags:
+      - specs
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Spec id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated purpose/requirements
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.updateSpecRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.specResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Update a spec
+      tags:
+      - specs
+  /specs/{id}/dependencies:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Spec id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Dependency target
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.dependencyRequest'
+      responses:
+        "204":
+          description: No Content
+      summary: Remove a spec dependency
+      tags:
+      - specs
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Spec id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Dependency target
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.dependencyRequest'
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: self-dependency rejected
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Add a spec dependency
+      tags:
+      - specs
+  /specs/generate:
+    post:
+      consumes:
+      - application/json
+      description: Drafts a spec from a short description without writing anything
+        to disk. Uses the default AI provider, or an explicit providerId override,
+        falling back to a deterministic template if none is configured or the provider
+        call fails.
+      parameters:
+      - description: Description (and optional provider override)
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.generateSpecRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.specResponse'
+      summary: Generate a draft spec
+      tags:
+      - specs
+swagger: "2.0"
