@@ -1,0 +1,1969 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "REST + SSE API for the OpenSpec Studio backend.",
+        "title": "OpenSpec Studio API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "basePath": "/api",
+    "paths": {
+        "/ai-providers": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ai-providers"
+                ],
+                "summary": "List configured AI providers",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.providerResponse"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ai-providers"
+                ],
+                "summary": "Configure a new AI provider",
+                "parameters": [
+                    {
+                        "description": "Provider config",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createProviderRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handler.providerResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "invalid kind, or CLI executable not found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/ai-providers/{id}": {
+            "delete": {
+                "tags": [
+                    "ai-providers"
+                ],
+                "summary": "Delete an AI provider",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Provider id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            },
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ai-providers"
+                ],
+                "summary": "Update an AI provider",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Provider id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated config",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.updateProviderRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.providerResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/ai-providers/{id}/default": {
+            "post": {
+                "tags": [
+                    "ai-providers"
+                ],
+                "summary": "Set the default AI provider",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Provider id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/ai-providers/{id}/health": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ai-providers"
+                ],
+                "summary": "Run a connectivity health check against a provider",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Provider id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.HealthResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/changes": {
+            "get": {
+                "description": "Lists every change across every registered, available project (or a single project via ?projectId=), including archived changes, with Kanban lifecycle status computed.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "changes"
+                ],
+                "summary": "List changes",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Filter to a single registered project",
+                        "name": "projectId",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.changeResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/changes/{id}": {
+            "get": {
+                "description": "Returns a change's full artifact content (proposal/design/tasks/specs) for the Kanban card detail view.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "changes"
+                ],
+                "summary": "Get change detail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Change id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.changeDetailResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/events": {
+            "get": {
+                "description": "Server-Sent Events stream. Emits an \"update\" event (with the changed file path as data) whenever a watched project's openspec/ directory changes on disk, plus a periodic heartbeat comment. Not a JSON request/response endpoint - no response schema applies.",
+                "produces": [
+                    "text/event-stream"
+                ],
+                "tags": [
+                    "events"
+                ],
+                "summary": "Real-time update stream (SSE)",
+                "responses": {}
+            }
+        },
+        "/fs/browse": {
+            "get": {
+                "description": "Lists a directory's real subdirectories on the machine the backend runs on, flagging each as an existing OpenSpec project and/or empty - powers the in-app Open/New directory picker. Read-only: never creates, modifies, or deletes anything. Defaults to the user's home directory when path is omitted.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "filesystem"
+                ],
+                "summary": "Browse local directories",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Absolute directory path to list (defaults to home directory)",
+                        "name": "path",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.browseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "path does not exist or is not a directory",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/healthz": {
+            "get": {
+                "description": "Reports that the backend process is up, and its version.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "healthz"
+                ],
+                "summary": "Health check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.healthzResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/overview": {
+            "get": {
+                "description": "Aggregates spec/change progress across every registered project (or a single project via ?projectId=): per-project spec/change-stage counts, a progress ratio, and a broken-cross-project-dependency count, plus aggregate totals and a most-recently-updated list of {projectId, projectName, lastOpenedAt} entries.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "overview"
+                ],
+                "summary": "Get cross-project overview",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Scope the overview to a single registered project",
+                        "name": "projectId",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Overview"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/projects": {
+            "get": {
+                "description": "Lists every registered project, most recently opened first. A project whose path no longer exists on disk is included with available=false rather than omitted.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "projects"
+                ],
+                "summary": "List registered projects",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.projectResponse"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Registers a directory as an active project. Read-only discovery: the directory must already contain a valid openspec/ structure - Open never scaffolds one. Use POST /projects/new for that.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "projects"
+                ],
+                "summary": "Open (register) an existing project",
+                "parameters": [
+                    {
+                        "description": "Directory to open",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.openProjectRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.projectResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "path missing, does not exist, or has no valid openspec/ structure",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/projects/new": {
+            "post": {
+                "description": "Scaffolds a fresh OpenSpec structure in an empty (or nonexistent-content) directory and registers it, distinct from opening an existing project.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "projects"
+                ],
+                "summary": "Create a new project",
+                "parameters": [
+                    {
+                        "description": "Directory to create the project in",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.openProjectRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handler.projectResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "path missing, does not exist, or is not empty",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/projects/{id}/debts": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "context"
+                ],
+                "summary": "List a project's tech-debt items",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Project id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.debtResponse"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "context"
+                ],
+                "summary": "Create a tech-debt item",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Project id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Debt item",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createDebtRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handler.debtResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/projects/{id}/debts/{debtId}": {
+            "delete": {
+                "tags": [
+                    "context"
+                ],
+                "summary": "Delete a tech-debt item",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Project id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Debt id",
+                        "name": "debtId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            },
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "context"
+                ],
+                "summary": "Update a tech-debt item's status",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Project id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Debt id",
+                        "name": "debtId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New status",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.updateDebtRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.debtResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/projects/{id}/reviews": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "context"
+                ],
+                "summary": "List a project's reviews",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Project id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.reviewResponse"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "context"
+                ],
+                "summary": "Create a review note",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Project id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Review",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createReviewRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handler.reviewResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/projects/{id}/reviews/{reviewId}": {
+            "delete": {
+                "tags": [
+                    "context"
+                ],
+                "summary": "Delete a review note",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Project id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Review id",
+                        "name": "reviewId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/specflow/flows": {
+            "get": {
+                "description": "Lists scheduled flows, optionally filtered to one project.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "specflow"
+                ],
+                "summary": "List Specflow flows",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Filter to a single registered project",
+                        "name": "projectId",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.flowResponse"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Only fully-planned changes can be scheduled, and dependency order is validated before the flow is saved.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "specflow"
+                ],
+                "summary": "Schedule a new Specflow flow",
+                "parameters": [
+                    {
+                        "description": "Flow",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createFlowRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handler.flowResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "incomplete change or unmet dependency",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/specflow/flows/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "specflow"
+                ],
+                "summary": "Get a Specflow flow",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Flow id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.flowResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "specflow"
+                ],
+                "summary": "Delete a Specflow flow",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Flow id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/specflow/flows/{id}/cancel": {
+            "post": {
+                "description": "Terminates the in-progress provider process and marks the flow cancelled; already-succeeded items are left intact.",
+                "tags": [
+                    "specflow"
+                ],
+                "summary": "Cancel a running Specflow flow",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Flow id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "409": {
+                        "description": "flow is not running",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/specflow/flows/{id}/reorder": {
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "specflow"
+                ],
+                "summary": "Reorder a pending flow's items",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Flow id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New item order",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.reorderFlowRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "flow already started",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/specs": {
+            "get": {
+                "description": "Lists every spec across every registered, available project (or a single project via ?projectId=), with resolved dependency links.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "specs"
+                ],
+                "summary": "List specs",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Filter to a single registered project",
+                        "name": "projectId",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.specResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "specs"
+                ],
+                "summary": "Create a spec",
+                "parameters": [
+                    {
+                        "description": "New spec",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.createSpecRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handler.specResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "spec already exists",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/specs/generate": {
+            "post": {
+                "description": "Drafts a spec from a short description without writing anything to disk. Uses the default AI provider, or an explicit providerId override, falling back to a deterministic template if none is configured or the provider call fails.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "specs"
+                ],
+                "summary": "Generate a draft spec",
+                "parameters": [
+                    {
+                        "description": "Description (and optional provider override)",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.generateSpecRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.specResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/specs/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "specs"
+                ],
+                "summary": "Get a spec",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Spec id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.specResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes a spec. If other specs depend on it and force=true is not set, returns 409 with the list of dependent specs instead of deleting.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "specs"
+                ],
+                "summary": "Delete a spec",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Spec id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Delete despite dependents",
+                        "name": "force",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "dependent specs",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.specResponse"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "specs"
+                ],
+                "summary": "Update a spec",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Spec id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated purpose/requirements",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.updateSpecRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.specResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/specs/{id}/dependencies": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "specs"
+                ],
+                "summary": "Add a spec dependency",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Spec id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dependency target",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.dependencyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "self-dependency rejected",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "specs"
+                ],
+                "summary": "Remove a spec dependency",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Spec id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dependency target",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.dependencyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "domain.HealthResult": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "ok": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "domain.Overview": {
+            "type": "object",
+            "properties": {
+                "projects": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.ProjectOverview"
+                    }
+                },
+                "recentlyUpdated": {
+                    "description": "most recently opened first",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.RecentProject"
+                    }
+                },
+                "totalInProgress": {
+                    "type": "integer"
+                },
+                "totalOpenChanges": {
+                    "description": "draft+todo+in_progress across all projects",
+                    "type": "integer"
+                }
+            }
+        },
+        "domain.ProjectOverview": {
+            "type": "object",
+            "properties": {
+                "available": {
+                    "type": "boolean"
+                },
+                "brokenSpecCount": {
+                    "description": "specs with an unavailable cross-project dependency",
+                    "type": "integer"
+                },
+                "changeCounts": {
+                    "description": "status -\u003e count, over draft/todo/in_progress/done/archived",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "integer"
+                    }
+                },
+                "progressRatio": {
+                    "description": "(done+archived) / (todo+in_progress+done+archived), 0 when no non-draft changes exist",
+                    "type": "number"
+                },
+                "projectId": {
+                    "type": "integer"
+                },
+                "projectName": {
+                    "type": "string"
+                },
+                "specCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "domain.RecentProject": {
+            "type": "object",
+            "properties": {
+                "lastOpenedAt": {
+                    "type": "string"
+                },
+                "projectId": {
+                    "type": "integer"
+                },
+                "projectName": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.SpecProvenance": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "project": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.artifactRefDTO": {
+            "type": "object",
+            "properties": {
+                "capability": {
+                    "type": "string"
+                },
+                "changeName": {
+                    "type": "string"
+                },
+                "kind": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.browseEntryDTO": {
+            "type": "object",
+            "properties": {
+                "hasOpenspec": {
+                    "type": "boolean"
+                },
+                "isEmpty": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.browseResponse": {
+            "type": "object",
+            "properties": {
+                "entries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handler.browseEntryDTO"
+                    }
+                },
+                "hasOpenspec": {
+                    "type": "boolean"
+                },
+                "isEmpty": {
+                    "type": "boolean"
+                },
+                "parent": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.changeDetailResponse": {
+            "type": "object",
+            "properties": {
+                "designMarkdown": {
+                    "type": "string"
+                },
+                "hasDesign": {
+                    "type": "boolean"
+                },
+                "hasProposal": {
+                    "type": "boolean"
+                },
+                "hasSpecs": {
+                    "type": "boolean"
+                },
+                "hasTasks": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "projectId": {
+                    "type": "integer"
+                },
+                "projectName": {
+                    "type": "string"
+                },
+                "proposalMarkdown": {
+                    "type": "string"
+                },
+                "specs": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                },
+                "tasksDone": {
+                    "type": "integer"
+                },
+                "tasksMarkdown": {
+                    "type": "string"
+                },
+                "tasksTotal": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.changeResponse": {
+            "type": "object",
+            "properties": {
+                "hasDesign": {
+                    "type": "boolean"
+                },
+                "hasProposal": {
+                    "type": "boolean"
+                },
+                "hasSpecs": {
+                    "type": "boolean"
+                },
+                "hasTasks": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "projectId": {
+                    "type": "integer"
+                },
+                "projectName": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "tasksDone": {
+                    "type": "integer"
+                },
+                "tasksTotal": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.createDebtRequest": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "link": {
+                    "$ref": "#/definitions/handler.artifactRefDTO"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.createFlowRequest": {
+            "type": "object",
+            "required": [
+                "changeNames",
+                "projectId",
+                "providerId",
+                "scheduledAt"
+            ],
+            "properties": {
+                "changeNames": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "projectId": {
+                    "type": "integer"
+                },
+                "providerId": {
+                    "type": "integer"
+                },
+                "scheduledAt": {
+                    "description": "RFC3339",
+                    "type": "string"
+                }
+            }
+        },
+        "handler.createProviderRequest": {
+            "type": "object",
+            "required": [
+                "kind",
+                "name"
+            ],
+            "properties": {
+                "apiKey": {
+                    "type": "string"
+                },
+                "cliArgs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "cliPath": {
+                    "type": "string"
+                },
+                "endpoint": {
+                    "type": "string"
+                },
+                "isDefault": {
+                    "type": "boolean"
+                },
+                "kind": {
+                    "description": "\"hosted\" or \"cli\"",
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.createReviewRequest": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "link": {
+                    "$ref": "#/definitions/handler.artifactRefDTO"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.createSpecRequest": {
+            "type": "object",
+            "required": [
+                "capability",
+                "projectId"
+            ],
+            "properties": {
+                "capability": {
+                    "type": "string"
+                },
+                "projectId": {
+                    "type": "integer"
+                },
+                "purpose": {
+                    "type": "string"
+                },
+                "requirements": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handler.specRequirementDTO"
+                    }
+                }
+            }
+        },
+        "handler.debtResponse": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "link": {
+                    "$ref": "#/definitions/handler.artifactRefDTO"
+                },
+                "projectId": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.dependencyRequest": {
+            "type": "object",
+            "required": [
+                "targetCapability",
+                "targetProjectId"
+            ],
+            "properties": {
+                "targetCapability": {
+                    "type": "string"
+                },
+                "targetProjectId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.errorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.flowItemResponse": {
+            "type": "object",
+            "properties": {
+                "changeName": {
+                    "type": "string"
+                },
+                "finishedAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "log": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "startedAt": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.flowResponse": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handler.flowItemResponse"
+                    }
+                },
+                "missed": {
+                    "type": "boolean"
+                },
+                "projectId": {
+                    "type": "integer"
+                },
+                "projectName": {
+                    "type": "string"
+                },
+                "providerId": {
+                    "type": "integer"
+                },
+                "scheduledAt": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.generateSpecRequest": {
+            "type": "object",
+            "required": [
+                "description"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "providerId": {
+                    "description": "0 = use the configured default provider",
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.healthzResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.openProjectRequest": {
+            "type": "object",
+            "required": [
+                "path"
+            ],
+            "properties": {
+                "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.projectResponse": {
+            "type": "object",
+            "properties": {
+                "available": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lastOpenedAt": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.providerResponse": {
+            "type": "object",
+            "properties": {
+                "cliArgs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "cliPath": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "endpoint": {
+                    "type": "string"
+                },
+                "hasApiKey": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "isDefault": {
+                    "type": "boolean"
+                },
+                "kind": {
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.reorderFlowRequest": {
+            "type": "object",
+            "required": [
+                "itemIds"
+            ],
+            "properties": {
+                "itemIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "handler.reviewResponse": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "link": {
+                    "$ref": "#/definitions/handler.artifactRefDTO"
+                },
+                "projectId": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.specDependencyDTO": {
+            "type": "object",
+            "properties": {
+                "available": {
+                    "type": "boolean"
+                },
+                "capability": {
+                    "type": "string"
+                },
+                "projectName": {
+                    "type": "string"
+                },
+                "projectPath": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.specRequirementDTO": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.specResponse": {
+            "type": "object",
+            "properties": {
+                "capability": {
+                    "type": "string"
+                },
+                "dependedBy": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handler.specDependencyDTO"
+                    }
+                },
+                "dependsOn": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handler.specDependencyDTO"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "linkedDebts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handler.debtResponse"
+                    }
+                },
+                "linkedReviews": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handler.reviewResponse"
+                    }
+                },
+                "projectId": {
+                    "type": "integer"
+                },
+                "projectName": {
+                    "type": "string"
+                },
+                "provenance": {
+                    "$ref": "#/definitions/domain.SpecProvenance"
+                },
+                "purpose": {
+                    "type": "string"
+                },
+                "requirements": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handler.specRequirementDTO"
+                    }
+                }
+            }
+        },
+        "handler.updateDebtRequest": {
+            "type": "object",
+            "required": [
+                "status"
+            ],
+            "properties": {
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.updateProviderRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "apiKey": {
+                    "type": "string"
+                },
+                "cliArgs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "cliPath": {
+                    "type": "string"
+                },
+                "endpoint": {
+                    "type": "string"
+                },
+                "model": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.updateSpecRequest": {
+            "type": "object",
+            "properties": {
+                "purpose": {
+                    "type": "string"
+                },
+                "requirements": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handler.specRequirementDTO"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,12 @@
+<!-- Logo lockup: mark + wordmark. The wordmark uses Plus Jakarta Sans (the UI font). -->
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="64" viewBox="0 0 360 64">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fc9e47"/>
+      <stop offset="1" stop-color="#d84a00"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="13" fill="url(#bg)"/>
+  <path transform="translate(32 32) scale(1.65) translate(-12 -12)" d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3z" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="76" y="42" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="26" font-weight="700" letter-spacing="-0.4" fill="#18181b">OpenSpec <tspan fill="#f3680f">Studio</tspan></text>
+</svg>

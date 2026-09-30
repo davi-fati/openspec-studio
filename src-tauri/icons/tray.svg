@@ -1,0 +1,4 @@
+<!-- macOS menu-bar template icon (black on transparent; the OS tints it). 22pt @2x. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 44 44">
+  <path transform="translate(22 22) scale(1.75) translate(-12 -12)" d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3z" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
